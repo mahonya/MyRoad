@@ -74,8 +74,8 @@ public class CoordPoint implements Parcelable{
 		return isEmpty;		
 	}	
 	
-	public String getBody(String method) {
-		return getSMSBody(); 
+	public String getBody() {
+		return getHTTPBody(); 
 	}
 	
 	public String getSMSBody() {

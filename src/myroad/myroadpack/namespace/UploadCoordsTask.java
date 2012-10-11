@@ -135,7 +135,7 @@ public class UploadCoordsTask extends AsyncTask<String, Void, String> {
 					//httppost.setParams(params);
 					httppost.setEntity(ent);
 					Log.d(MRDefaults.LOGTAG, "uri: " + httppost.getURI());
-					Log.d(MRDefaults.LOGTAG, "Sending point: " + cp.getSMSBody());
+					Log.d(MRDefaults.LOGTAG, "Sending point: " + cp.getBody());
 
 					HttpResponse response = httpclient.execute(httppost);
 					StatusLine statusLine = response.getStatusLine();
@@ -179,7 +179,7 @@ public class UploadCoordsTask extends AsyncTask<String, Void, String> {
 							Log.e(MRDefaults.LOGTAG, "Empty entity in response");								
 						}
 					} else { // HTTP error
-						Log.d(MRDefaults.LOGTAG, "body: "+cp.getSMSBody());
+						Log.d(MRDefaults.LOGTAG, "body: "+cp.getBody());
 						Log.e(MRDefaults.LOGTAG, "HTTP error: " + HttpStatusCode2Message(statusCode));
 						sretvalue = "HTTP error: " + HttpStatusCode2Message(statusCode);
 						errno++;						
@@ -231,8 +231,8 @@ public class UploadCoordsTask extends AsyncTask<String, Void, String> {
 				    PendingIntent deliveredPI = PendingIntent.getBroadcast(context, MRDefaults.BROD_SMS_DELIVER,
 				        intent2, 0);				    				    				 				    
 				    
-				    Log.d(MRDefaults.LOGTAG, "SMS: " + cp.getSMSBody());
-					smsManager.sendTextMessage(phoneNo, null, cp.getSMSBody(), sentPI, deliveredPI);
+				    Log.d(MRDefaults.LOGTAG, "SMS: " + cp.getBody());
+					smsManager.sendTextMessage(phoneNo, null, cp.getBody(), sentPI, deliveredPI);
 					queue.poll();
 					
 				} catch (Exception e) {
