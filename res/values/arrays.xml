@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="methodListArray">
+   <item>HTTP</item>
+   <item>SMS</item>
+   <item>auto</item>
+</string-array>
+ 
+<string-array name="methodListValues">
+   <item>HTTP</item>
+   <item>SMS</item>
+   <item>auto</item>
+</string-array>
+
+<string-array name="phoneListArray">
+   <item>+7·923·737·7623 (RU)</item>
+   <item>+1·707·797·7623 (US)</item>
+</string-array>
+ 
+<string-array name="phoneListValues">
+   <item>79237377623</item>
+   <item>17077977623</item>
+</string-array>
+
+<string-array name="entries_lang">
+  <item>Device</item>
+  <item>English</item>
+  <item>Russian</item> 
+</string-array> 
+
+<string-array name="entryvalues_lang">
+  <item>default</item> 
+  <item>en</item>
+  <item>ru</item> 
+</string-array>
+</resources>

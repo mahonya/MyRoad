@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Welcome to MyRoad beta by Izam!</string>
+    <string name="app_name">MyRoad</string>
+	    
+    <string name="send_button">Send coords now!</string>
+    <string name="view_button">Refresh current coords</string>    
+    <string name="pref_button">Preferences</string>    
+    <string name="quit_button">Exit</string>
+    <string name="quit_button_hint">Exit w/o background tracking!</string>    
+    <string name="save_point_button">Save coords</string>    
+    <string name="cur_status">Status</string>    
+    <string name="point_name">PointName</string>
+    <string name="point_name_hint">Enter a point name please</string>
+    <string name="addpoint_button">Add point manually</string>
+    <string name="addpoint_button_hint">Add point to track</string>
+    <string name="cur_mode">Mode</string>
+    <string name="cur_coords">Coords</string>
+    <string name="cur_datetime">Datetime</string>
+    <string name="cur_track">Track</string>
+    <string name="cur_points">Points</string>
+	<string name="cur_network">Network</string>
+    <string name="cur_detected">Detected at:</string>
+    <string name="point_desc">Description</string>
+	<string name="no_line">No line (out of the track)</string>
+	
+	<string name="network_type">Network Type</string>
+   	<string name="available">available</string>
+	<string name="not_available">not available</string>	
+	<string name="queue_points">queue points</string>	
+	<string name="sent">was sent</string>
+	<string name="mgpsisoff">GPS is OFF</string>	
+	<string name="empty">empty</string>	
+	<string name="please_su">Please set username</string>	
+	<string name="please_sp">Please set password</string>
+
+	<string name="LangTitle">Language</string>
+	<string name="LangDialogTitle">Select language:</string>
+	<string name="LangSummary">Application language.\nNeed restart application to apply.</string>
+	
+	<string name="pref_account">Your my-road.info account:</string>			
+	<string name="pref_uname">Login</string>
+	<string name="pref_pass">Password</string>
+	
+	<string name="pref_deftr">Keep empty for default track</string>	
+	
+</resources>

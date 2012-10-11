@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<!--     
+    <item android:id="@+id/send" android:icon="@drawable/ic_menu_send" android:title="@string/send_button"></item>        
+    <item android:id="@+id/view" android:icon="@drawable/ic_menu_refresh" android:title="@string/view_button"></item>
+            -->
+    <item android:id="@+id/options" android:icon="@drawable/ic_menu_options" android:title="@string/pref_button"></item>        
+    <item android:id="@+id/exit" android:icon="@drawable/ic_menu_exit" android:title="@string/quit_button"></item>
+</menu>

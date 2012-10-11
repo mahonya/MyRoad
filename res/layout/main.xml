@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="true"
+    android:fillViewport="true" 
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:text="@string/hello" android:textColor="#FFFFFF" android:typeface="sans"/>
+    
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:text="@string/cur_coords" android:textColor="#00EE00"/>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:text="@string/cur_detected" android:textColor="#00EEEE"/>
+
+        </TableRow>
+      
+      
+		<TableRow
+            android:id="@+id/tableRow13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">           
+		    
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:text="@string/cur_track" android:textColor="#EEEE00"/>		    
+        </TableRow> 
+		
+    <TableRow
+            android:id="@+id/tableRow15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+    
+<TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:text="@string/cur_network" android:textColor="#EE00EE"/>		        
+    
+</TableRow>   		
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+		    <EditText
+		        android:id="@+id/editText1"
+		        android:layout_width="match_parent"
+		        android:layout_height="40dp"
+		        android:layout_marginLeft="2dp"
+		        android:layout_marginTop="5dp"		        
+		        android:inputType="textWebEditText" 
+		        android:ems="10" android:text="@string/point_name" android:hint="@string/point_name_hint">	
+
+		        <requestFocus android:layout_width="match_parent" />
+
+	    </EditText>
+	        
+		    		    
+
+    	</TableRow>
+    <TableRow
+            android:id="@+id/tableRow14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+   
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="5dp"        
+        android:ems="10"
+        android:inputType="textMultiLine" android:text="@string/point_desc" android:hint="@string/point_name_hint"/>
+
+       
+</TableRow>
+    
+    <TableRow
+            android:id="@+id/tableRow16"           
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+    
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="0dp"        
+        android:text="@string/no_line" />
+
+
+</TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow17"
+        android:layout_width="70pt"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/button5"
+            android:hint="@string/addpoint_button_hint"
+            android:onClick="OnClick"
+            android:text="@string/addpoint_button" />
+
+    </TableRow>
+  
+    <TableRow
+        android:id="@+id/tableRow18"
+        android:layout_width="70pt"
+        android:layout_height="wrap_content" >
+
+    </TableRow>                       
+    </TableLayout>
+
+</LinearLayout>

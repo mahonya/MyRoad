@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="Localization">
+	<ListPreference android:key="lang" android:title="@string/LangTitle" android:summary="@string/LangSummary" android:entries="@array/entries_lang" android:entryValues="@array/entryvalues_lang" android:dialogTitle="@string/LangDialogTitle"/>        
+    </PreferenceCategory>    
+    <PreferenceCategory android:title="@string/pref_account">
+        <EditTextPreference android:title="@string/pref_uname" android:key="username" android:defaultValue="user"/>
+        <EditTextPreference android:title="@string/pref_pass" android:key="password" android:defaultValue="pin"/>
+        <EditTextPreference android:title="TrackID" android:key="trackid" android:summary="@string/pref_deftr"  android:enabled="true" android:selectable="true" android:shouldDisableView="true"/>
+     </PreferenceCategory>
+    <PreferenceCategory android:title="Coords will send...">     
+        <CheckBoxPreference android:key="autosend" android:summary="Automaticly by timeout or meters" android:title="Auto" android:defaultValue="true" android:selectable="true" android:enabled="true"/>
+        <EditTextPreference android:key="deltasecs" android:summary="Every N secounds" android:title="Timeout, sec" android:defaultValue="120" android:enabled="true" android:selectable="true" android:inputType="numberDecimal"/>
+        <EditTextPreference android:key="deltametres" android:summary="Every N meters" android:title="Delta, metres" android:defaultValue="1000" android:enabled="true" android:selectable="true" android:inputType="numberDecimal"/>
+        <ListPreference android:key="method" android:title="Sending method" android:summary="Via HTTP or SMS" android:defaultValue="auto" android:entries="@array/methodListArray" android:entryValues="@array/methodListValues"/>
+        <ListPreference android:key="phone" android:title="Phone number" android:summary="SMS receiver" android:defaultValue="79237377623" android:entries="@array/phoneListArray" android:entryValues="@array/phoneListValues"/>
+     </PreferenceCategory>        
+    <PreferenceCategory android:title="File system">        
+        <EditTextPreference android:key="extpath" android:title="Path" android:summary="Place to storing data" android:defaultValue="/mnt/extsd"/>        
+        <Preference android:key="prevla" android:shouldDisableView="true" android:selectable="false"/>
+        <Preference android:key="prevlo" android:shouldDisableView="true" android:selectable="false"/>
+		<Preference android:key="lastPath" android:shouldDisableView="true" android:selectable="false"/>                                     
+    </PreferenceCategory>    
+</PreferenceScreen>

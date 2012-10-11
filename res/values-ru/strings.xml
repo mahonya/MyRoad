@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">MyRoad Tracker beta</string>
+    <string name="app_name">MyRoad</string>
+	    
+    <string name="send_button">Отправить тек. координаты</string>
+    <string name="view_button">Обновить координаты</string>    
+    <string name="pref_button">Настройки</string>    
+    <string name="quit_button">Выход</string>
+    <string name="quit_button_hint">Выход без отслеживания</string>    
+    <string name="save_point_button">Сохранить координаты</string>    
+    <string name="cur_status">Статус</string>    
+    <string name="point_name">Point name</string>
+    <string name="point_name_hint">Укажите имя точки</string>
+    <string name="addpoint_button">Добавить точку</string>
+    <string name="addpoint_button_hint">Добавить точку к путешествию</string>
+    <string name="cur_mode">Режим</string>
+    <string name="cur_coords">Координаты</string>
+    <string name="cur_datetime">Дата и время</string>
+    <string name="cur_track">Путешествие</string>
+    <string name="cur_points">Точки</string>
+	<string name="cur_network">Соединение</string>
+    <string name="cur_detected">Определено:</string>
+    <string name="point_desc">Description</string>
+	<string name="no_line">Вне маршрута</string>	     
+	
+	<string name="network_type">Тип связи</string>
+	<string name="available">работает</string>
+	<string name="not_available">недоступно</string>	
+	<string name="queue_points">точек получено</string>	
+	<string name="sent">отправлено</string>	
+	<string name="mgpsisoff">GPS выключен</string>	
+	<string name="empty">пусто</string>			
+	<string name="please_su">Задайте имя пользователя</string>	
+	<string name="please_sp">Введите пароль</string>
+	
+	<string name="LangTitle">Язык</string>
+	<string name="LangDialogTitle">Выберите язык:</string>
+	<string name="LangSummary">Язык приложения.\nНеобходимо перезапустить приложение для принятия изменений.</string>
+	
+	<string name="pref_account">Ваш аккаунт на my-road.info</string>
+	<string name="pref_uname">Логин</string>			
+	<string name="pref_pass">Пароль</string>	
+	
+	<string name="pref_deftr">Оставьте пустым для путешествия по умолчанию</string>	
+
+</resources>
