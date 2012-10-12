@@ -118,8 +118,9 @@ public class UploadCoordsTask extends AsyncTask<String, Void, String> {
 			}
 					
 			// HTTP
-			if(sendingMethod.equals("HTTP") || sendingMethod.equals("auto")) { 
-			ent = cp.getHttpEntity();		
+			if(sendingMethod.equals("HTTP") || sendingMethod.equals("auto")) {
+				
+			ent = cp.getHttpEntity();			
 
 			if (ent != null) {
 				try {
@@ -127,10 +128,10 @@ public class UploadCoordsTask extends AsyncTask<String, Void, String> {
 				    //httppost.setHeader("Accept-Charset", "utf-8");
 				    //httppost.setHeader("Accept-Language", "en-us");		
 				    //httppost.setHeader("Accept", "text/*");
-				    httppost.setHeader("Content-Type", "text/html; charset=utf-8"); 
+				    //httppost.setHeader("Content-Type", "text/html; charset=utf-8"); 
 				    // тут должна быть локализация!
 				    //httppost.setHeader("Content-Language", ""+lang);
-				    Log.d(MRDefaults.LOGTAG, "Content-Language: " + lang);
+				    //Log.d(MRDefaults.LOGTAG, "Content-Language: " + lang);
 
 					//httppost.setParams(params);
 					httppost.setEntity(ent);

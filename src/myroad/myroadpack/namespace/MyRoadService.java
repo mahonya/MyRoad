@@ -633,11 +633,11 @@ public class MyRoadService extends Service {
         if(locationListener!=null) {
 			Log.d(MRDefaults.LOGTAG, "mlocManager.requestLocationUpdates");
 			
-			mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 
-					1, locationListener);		
+			mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 
+					0, locationListener);		
 			
-			mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 
-					1, locationListener);					
+			mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 
+					0, locationListener);					
 			/*
 			mlocManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, (iSecs*1000), 
 					iMetres, locationListener);

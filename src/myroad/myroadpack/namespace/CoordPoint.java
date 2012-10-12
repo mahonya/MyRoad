@@ -171,7 +171,7 @@ public class CoordPoint implements Parcelable{
 		}		
 							
 		try {
-			ent = new UrlEncodedFormEntity(nameValuePairs);
+			ent = new UrlEncodedFormEntity(nameValuePairs, "utf-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.e("my-road", getClass().getName() + " UnsupportedEncodingException: " + e.getMessage());
 			e.printStackTrace();
