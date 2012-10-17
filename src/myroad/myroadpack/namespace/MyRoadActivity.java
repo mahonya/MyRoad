@@ -431,9 +431,12 @@ public class MyRoadActivity extends Activity implements OnClickListener {
         	doUnbindService();
         	
 		    service = new Intent(this, MyRoadService.class);
-		    stopService(service);
+		    stopService(service);		    
 		    
         	finish();
+			System.runFinalizersOnExit(true);
+			System.exit(0);
+        	
             return true;
             
         default:
