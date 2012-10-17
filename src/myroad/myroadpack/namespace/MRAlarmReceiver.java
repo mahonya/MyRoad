@@ -14,8 +14,8 @@ public class MRAlarmReceiver extends BroadcastReceiver {
 		final MyRoadService service = ((MyRoadApplication) context.getApplicationContext()).getNavigationService();
 		// do not do nothing
 		if (lock.isHeld() || service == null) {
-			Log.d(MRDefaults.LOGTAG, getClass().getName() + " lock.isHeld(): " + lock.isHeld() + 
-					", service: " + (service==null?"null":"not null"));
+			//Log.d(MRDefaults.LOGTAG, getClass().getName() + " lock.isHeld(): " + lock.isHeld() + 
+			//		", service: " + (service==null?"null":"not null"));
 			return;
 		}
 		//
@@ -23,6 +23,7 @@ public class MRAlarmReceiver extends BroadcastReceiver {
 		// request location updates
 		final LocationManager locationManager = (LocationManager) service.getSystemService(Context.LOCATION_SERVICE);
 		try {
+			Log.d(MRDefaults.LOGTAG, getClass().getName() + ".requestLocationUpdates");			
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, service);
 		} catch (RuntimeException e) {
 			Log.e(MRDefaults.LOGTAG, getClass().getName() + " Exception: " + e.getMessage());
