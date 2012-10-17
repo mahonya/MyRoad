@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.xmlpull.v1.XmlPullParser;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -41,6 +42,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -48,7 +51,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.util.Xml;
 
-public class MyRoadService extends Service {
+public class MyRoadService extends Service implements LocationListener {
 	
 //	final static String MY_FILEDATE_FORMAT = "yyyy_MM_dd_HH_mm_ss";					
 	
@@ -57,7 +60,9 @@ public class MyRoadService extends Service {
 	private int iMetres = MRDefaults.DEFAUIT_METRES; 
 
 	private SharedPreferences preferences;
-	OnSharedPreferenceChangeListener prefsListener;	
+	OnSharedPreferenceChangeListener prefsListener;
+	
+	private static WakeLock lockStatic = null;	
 	
 	String strUrl = MRDefaults.baseURL + "/track.php";
 
@@ -70,6 +75,8 @@ public class MyRoadService extends Service {
 	String lang = "";
 		
 	LocationManager mlocManager;
+	
+	PendingIntent pendingIntent = null;
 	
 	boolean statusOfGPS = false;
 	boolean statusOfNetwork = false;
@@ -122,15 +129,11 @@ public class MyRoadService extends Service {
 	String kmlFileName = "";    
 	String gpxFileName = "";	
         
-    private LocationListener locationListener = null;
+    //private LocationListener locationListener = null;
 //    private LocationListener networkListener = null;
     
 	UploadCoordsTask task = null;	           
-    boolean isIamVisible = true;	
-	
-	private NotificationManager mNM = null;
-    // Unique Identification Number for the Notification.
-    // We use it on Notification start, and to cancel it.
+    boolean isIamVisible = true;		
 
     ArrayList<Messenger> mClients = new ArrayList<Messenger>();	
     private int NOTIFICATION = 111;	    
@@ -219,33 +222,14 @@ public class MyRoadService extends Service {
     	gpxFileName   = MRDefaults.getQueueFileName(GetUser(), GetTrack(), "gpx");
   
     	mNetworkStateChangedFilter = new IntentFilter();
-    	mNetworkStateChangedFilter.addAction(Intent. ACTION_TIME_TICK);		
+    	mNetworkStateChangedFilter.addAction(Intent.ACTION_TIME_TICK);		
     	mNetworkStateChangedFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);		  
 	
     	mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    	smsManager = SmsManager.getDefault();
-	
-    	mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);    	
+    	smsManager = SmsManager.getDefault();	    	    	    	
     	
-    	// Display a notification about us starting.  We put an icon in the status bar.
-   		//showNotification();	
-	
-    	// if(LoadQueue()) {
-    	
-    	//inh.postAtTime(r, uptimeMillis)
-    	
-    	getStorageDirectory();
-    	
-		//Log.v(MRDefaults.LOGTAG, "Sending queue loaded OK");
-		if(queue.size()>0) {
-		//tView4.setText(tV4Prefix + ": " + queue.size() + " points in queue "+(queue.size()>0?"loaded":""));
-			// надо отправлять сообщение для изменения визуального состояния активити
-		} else {
-//			LoadQueue();
-		}
-		//}		
-				
-		LoadQueue();
+    	getStorageDirectory();    					
+		LoadQueue();		
 					
 		receiver = new BroadcastReceiver() {
 		    @Override
@@ -261,8 +245,8 @@ public class MyRoadService extends Service {
 				    boolean mAvailable = info.isAvailable();
 				    
 				    Log.d(MRDefaults.LOGTAG, getClass().getName() + "" +getString(R.string.network_type) + ": " + 
-				    		mTypeName + 
-						", " + mSubtypeName + (mAvailable?(""+getString(R.string.available)):(""+
+				    		mTypeName + ", " + 
+				    		mSubtypeName + (mAvailable?(""+getString(R.string.available)):(""+
 								getString(R.string.not_available))));
 				    
 				    sNetStatus = (mTypeName.length()>12?(mTypeName.substring(0, 9)+"..."):mTypeName);
@@ -384,7 +368,7 @@ public class MyRoadService extends Service {
 		                	
 		                    break;
 		                default:
-		                	Log.e(MRDefaults.LOGTAG, "SMS not sent with code: " + getResultCode()+" " + sign);
+		                	Log.e(MRDefaults.LOGTAG, "SMS not sent with code: " + getResultCode() + " " + sign);
 							sretvalue = "Error: " + "SMS not delivered with code";
 							errno++;
 		                    break;                        
@@ -422,7 +406,7 @@ public class MyRoadService extends Service {
 		                    break;
 		                default:
 		                	countAll ++;
-		                	Log.e(MRDefaults.LOGTAG, "SMS not delivered with code: " + getResultCode()+" " + sign);
+		                	Log.e(MRDefaults.LOGTAG, "SMS not delivered with code: " + getResultCode() + " " + sign);
 							sretvalue = "Error: " + "SMS not delivered with code";
 							errno++;
 		                    break;                        
@@ -430,159 +414,168 @@ public class MyRoadService extends Service {
 		        }
 		    };
 		    
-		    registerReceiver(smsReceiver2, new IntentFilter(MRDefaults.DELIVERED));
-		    		    		
-		    		
-		registerReceiver(receiver, mNetworkStateChangedFilter);
+		registerReceiver(smsReceiver2, new IntentFilter(MRDefaults.DELIVERED));
+		    		    				    		
+		registerReceiver(receiver, mNetworkStateChangedFilter);				
 		
-		if(locationListener==null) {		
-			locationListener = new LocationListener() 
-			{ 
-				public void onLocationChanged(Location new_loc) {					
-						
-					boolean isAccept = false;
-					if(statusOfGPS) {
-						if(LocationManager.GPS_PROVIDER.equals(loc.getProvider())) {
-							isAccept = true;						
-						}
-					} else {
-						isAccept = true;
-					}
-					
-					if(new_loc!=null) {
-						loc = new_loc;						
-					}
-					double distance = 0.0;
-					
-					if(isAccept) { // тут проверяем на таймаут и дистанцию
-				    	//distanceTo(Location dest)    
-						if(prevLoc!=null) {
-							if(loc!=null) {
-								distance = loc.distanceTo(prevLoc);
-								if((Double.compare(distance, iMetres*1.0) >=0 ) || 
-										((SystemClock.elapsedRealtime() - lPrevMillis) > (iSecs*1000))) {
-									// дистанция больше
-									isAccept = true;
-								} else {
-									isAccept = false;
-								}
-							}							
-						} else {
-							if(loc!=null) { // первая точка
-								isAccept = true;
-							}							
-						}						
-					}
-					
-					if(isAccept) {											
-						
-						latitude  = new_loc.getLatitude();
-						longitude = new_loc.getLongitude();
-						altitude  = new_loc.getAltitude();
-						
-						sDetectedCoordsDateTime = MRDefaults.GenMyDate(MRDefaults.MY_DATE_FORMAT);
-						
-						Log.d(MRDefaults.LOGTAG, "Provider name:" + new_loc.getProvider());
-	
-						GetGPSStatus(true, false, "", "", false, true);
-						SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
-						
-						prevLoc = loc;
-						lPrevMillis = SystemClock.elapsedRealtime();
-					}
-				}
-				
-				public void onProviderEnabled(String provider) {				
-					if(LocationManager.GPS_PROVIDER.equals(provider))
-						statusOfGPS = mlocManager.isProviderEnabled(provider);
-					if(LocationManager.NETWORK_PROVIDER.equals(provider))
-						statusOfNetwork = mlocManager.isProviderEnabled(provider);				
-									
-					Log.d(MRDefaults.LOGTAG, "Provider name: " + provider + ", statusOfGPS: " + statusOfGPS + 
-							", statusOfNetwork: " + statusOfNetwork);				
-					
-					GetGPSStatus(true, false, "", "", false, false);
-					SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
-					
-					//if (IsGPSOn()) {
-					//}
-				}
-				
-				public void onProviderDisabled(String provider) {
-					if(LocationManager.GPS_PROVIDER.equals(provider))
-						statusOfGPS = mlocManager.isProviderEnabled(provider);				
-					if(LocationManager.NETWORK_PROVIDER.equals(provider))
-						statusOfNetwork = mlocManager.isProviderEnabled(provider);				
-					
-					Log.d(MRDefaults.LOGTAG, "Provider name: " + provider + ", statusOfGPS: " + statusOfGPS + 
-							", statusOfNetwork: " + statusOfNetwork);				
-
-					GetGPSStatus((statusOfGPS||statusOfNetwork)?true:false, false, "", "", false, false);
-					SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
-					
-					//if (!IsGPSOn()) {		
-					//}
-				}			
-
-				public void onStatusChanged(String provider, int status, Bundle extras) {
-					Log.d(MRDefaults.LOGTAG, "Provider: " + provider + " status changed: " + status);
-					
-					boolean isChanged = false;
-		            switch (status) {
-			            case LocationProvider.AVAILABLE:
-			            	if(LocationManager.GPS_PROVIDER.equals(provider)) {
-			            		if(!statusOfGPS) {
-			            			statusOfGPS = true;
-			            			isChanged = true;
-			            		}
-			            	} else {
-			            		if(!statusOfNetwork) {
-			            			statusOfNetwork = true;
-			            			isChanged = true;
-			            		}		            		
-			            	}
-			                break;
-			            case LocationProvider.OUT_OF_SERVICE:
-			            	if(LocationManager.GPS_PROVIDER.equals(provider)) {
-			            		if(statusOfGPS) {
-			            			statusOfGPS = false;
-			            			isChanged = true;
-			            		}
-			            	} else {
-			            		if(statusOfNetwork) {
-			            			statusOfNetwork = false;
-			            			isChanged = true;
-			            		}		            				            		
-			            	}
-			                break;
-			            case LocationProvider.TEMPORARILY_UNAVAILABLE:
-			            	if(LocationManager.GPS_PROVIDER.equals(provider)) {
-			            		if(statusOfGPS) {
-			            			statusOfGPS = false;
-			            			isChanged = true;
-			            		}			            		
-			            	} else {
-			            		if(statusOfNetwork) {
-			            			statusOfNetwork = false;
-			            			isChanged = true;
-			            		}		            				            				            		
-			            	}
-			                break;
-		            }															
-		            
-		            if(isChanged) {
-		            	GetGPSStatus(false /*true*/, false, "", "", false, false);
-						SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
-		            }
-				}			
-			};								
-			}
+		((MyRoadApplication)getApplication()).setNavigationService(this);
 		
-		showNotification();
+		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, 
+				new Intent(this, MRAlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+				SystemClock.elapsedRealtime() + 500, 1000, pendingIntent);
+		
+		
+		showNotification();		
     }
+    
+	public void onLocationChanged(Location new_loc) {
+		boolean isAccept = false;
+		if(new_loc==null) return;
+		String newprov = new_loc.getProvider(); 
+				
+		if(statusOfGPS) {
+			if(LocationManager.GPS_PROVIDER.equals(newprov)) {
+				isAccept = true;						
+			}
+		} 
+		if(!isAccept) {
+			if(statusOfNetwork) {
+				if(LocationManager.NETWORK_PROVIDER.equals(newprov)) {
+					isAccept = true;
+				}
+			}
+		}
+		
+		Log.d(MRDefaults.LOGTAG, "statusOfGPS = " + statusOfGPS + ", statusOfNetwork = " + statusOfNetwork +
+				", isAccept = " + isAccept + ", newprov = " + newprov);
+		
+		if(new_loc!=null) {
+			loc = new_loc;						
+		}
+		double distance = 0.0;
+		
+		if(isAccept) { // тут проверяем на таймаут и дистанцию
+	    	//distanceTo(Location dest)    
+			if(prevLoc!=null) {
+				if(loc!=null) {
+					distance = loc.distanceTo(prevLoc);
+					if((Double.compare(distance, iMetres*1.0) >=0 ) || 
+							((SystemClock.elapsedRealtime() - lPrevMillis) > (iSecs*1000))) {
+						// дистанция больше
+						isAccept = true;
+					} else {
+						isAccept = false;
+					}
+				}							
+			} else {
+				if(loc!=null) { // первая точка
+					isAccept = true;
+				}							
+			}						
+		}
+		
+		if(isAccept) {											
+			
+			latitude  = new_loc.getLatitude();
+			longitude = new_loc.getLongitude();
+			altitude  = new_loc.getAltitude();
+			
+			sDetectedCoordsDateTime = MRDefaults.GenMyDate(MRDefaults.MY_DATE_FORMAT);
+			
+			Log.d(MRDefaults.LOGTAG, "Provider name:" + new_loc.getProvider());
+
+			GetGPSStatus(true, false, "", "", false, true);
+			SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
+			
+			prevLoc = loc;
+			lPrevMillis = SystemClock.elapsedRealtime();
+		}
+	}
+	
+	public void onProviderEnabled(String provider) {				
+		if(LocationManager.GPS_PROVIDER.equals(provider))
+			statusOfGPS = mlocManager.isProviderEnabled(provider);
+		if(LocationManager.NETWORK_PROVIDER.equals(provider))
+			statusOfNetwork = mlocManager.isProviderEnabled(provider);				
+						
+		Log.d(MRDefaults.LOGTAG, "Provider name: " + provider + ", statusOfGPS: " + statusOfGPS + 
+				", statusOfNetwork: " + statusOfNetwork);				
+		
+		GetGPSStatus(true, false, "", "", false, false);
+		SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
+	}
+	
+	public void onProviderDisabled(String provider) {
+		if(LocationManager.GPS_PROVIDER.equals(provider))
+			statusOfGPS = mlocManager.isProviderEnabled(provider);				
+		if(LocationManager.NETWORK_PROVIDER.equals(provider))
+			statusOfNetwork = mlocManager.isProviderEnabled(provider);				
+		
+		Log.d(MRDefaults.LOGTAG, "Provider name: " + provider + ", statusOfGPS: " + statusOfGPS + 
+				", statusOfNetwork: " + statusOfNetwork);				
+
+		GetGPSStatus((statusOfGPS||statusOfNetwork)?true:false, false, "", "", false, false);
+		SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
+	}			
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		Log.d(MRDefaults.LOGTAG, "Provider: " + provider + " status changed: " + status);
+		
+		boolean isChanged = false;
+        switch (status) {
+            case LocationProvider.AVAILABLE:
+            	if(LocationManager.GPS_PROVIDER.equals(provider)) {
+            		if(!statusOfGPS) {
+            			statusOfGPS = true;
+            			isChanged = true;
+            		}
+            	} else {
+            		if(!statusOfNetwork) {
+            			statusOfNetwork = true;
+            			isChanged = true;
+            		}		            		
+            	}
+                break;
+            case LocationProvider.OUT_OF_SERVICE:
+            	if(LocationManager.GPS_PROVIDER.equals(provider)) {
+            		if(statusOfGPS) {
+            			statusOfGPS = false;
+            			isChanged = true;
+            		}
+            	} else {
+            		if(statusOfNetwork) {
+            			statusOfNetwork = false;
+            			isChanged = true;
+            		}		            				            		
+            	}
+                break;
+            case LocationProvider.TEMPORARILY_UNAVAILABLE:
+            	if(LocationManager.GPS_PROVIDER.equals(provider)) {
+            		if(statusOfGPS) {
+            			statusOfGPS = false;
+            			isChanged = true;
+            		}			            		
+            	} else {
+            		if(statusOfNetwork) {
+            			statusOfNetwork = false;
+            			isChanged = true;
+            		}		            				            				            		
+            	}
+                break;
+        }															
+        
+        if(isChanged) {
+        	GetGPSStatus(false /*true*/, false, "", "", false, false);
+			SendMessage(MRDefaults.SERVMSG_LAST_STATE, errno);
+        }
+	}												    
 	
     @Override
     public void onDestroy() {
+    	super.onDestroy();
+    	
     	Log.v(MRDefaults.LOGTAG, "Service.onDestroy()");
     	
     	getStorageDirectory();
@@ -594,28 +587,42 @@ public class MyRoadService extends Service {
     		SaveQueue();
     	}
     	
-    	if(mNM!=null)
-    	mNM.cancel(NOTIFICATION);
+		mlocManager.removeUpdates(this);    
+		
+		WakeLock lock = getLock(this);
+		if (lock.isHeld()) {
+			lock.release();
+		}		
     	
-		if(locationListener!=null) {
-			mlocManager.removeUpdates(locationListener);
-		}
+		((MyRoadApplication)getApplication()).setNavigationService(null);    	
+		
+		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		alarmManager.cancel(pendingIntent);		
+    	
+    	NotificationManager mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+    	if(mNM!=null)
+    		mNM.cancel(NOTIFICATION);
+    	
+//		if(locationListener!=null) {
+		//}
 		try {
 			if(receiver!=null) {		
 				unregisterReceiver(receiver);
+				receiver = null;
 			}						
 			if(smsReceiver1!=null) {
 				unregisterReceiver(smsReceiver1);
+				smsReceiver1 = null;
 			}
 			if(smsReceiver2!=null) {
 				unregisterReceiver(smsReceiver2);
+				smsReceiver2 = null;
 			}						
 		} catch (Exception e) {
 			Log.e(MRDefaults.LOGTAG, getClass().getName() + " Exception: " + e.getMessage());
 			e.printStackTrace();	        
 	    }		
-		
-    	super.onDestroy();		
+		    			
     }
     
     @Override
@@ -624,27 +631,45 @@ public class MyRoadService extends Service {
         return mMessenger.getBinder();    	
     }
     
+	protected synchronized static PowerManager.WakeLock getLock(Context context) {
+		if (lockStatic == null) {
+			PowerManager mgr = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+			lockStatic = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyRoadServiceLock");
+		}
+		return lockStatic;
+	}    
+    
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(MRDefaults.LOGTAG, "LocalService " + "Received start id " + startId + ": " + intent);
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
         
-        if(locationListener!=null) {
+        //if(locationListener!=null) {
 			Log.d(MRDefaults.LOGTAG, "mlocManager.requestLocationUpdates");
-			
-			mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 
-					0, locationListener);		
-			
-			mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 
-					0, locationListener);					
+			try {
+				statusOfGPS = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+				mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 
+						0, MyRoadService.this);
+				
+				statusOfNetwork = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);				
+				mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 
+						0, MyRoadService.this);
+				
+			} catch (IllegalArgumentException e) {
+				Log.e(MRDefaults.LOGTAG, "Cannot request updates: " + e.getMessage());
+
+			} finally {
+				Log.d(MRDefaults.LOGTAG, "mlocManager.requestLocationUpdates SET OK");
+			}
+										
 			/*
 			mlocManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, (iSecs*1000), 
 					iMetres, locationListener);
 					*/				
         	
-        }
-        return START_NOT_STICKY;
+        //}
+        return /* START_NOT_STICKY*/ START_REDELIVER_INTENT;
     }   
     
     private void showNotification() {    	
@@ -658,7 +683,6 @@ public class MyRoadService extends Service {
                 System.currentTimeMillis());
 
         // The PendingIntent to launch our activity if the user selects this notification
-
         //PendingIntent.getBroadcast(context, requestCode, intent, flags)
         
         Intent intent = new Intent(this, MyRoadActivity.class);
@@ -676,10 +700,11 @@ public class MyRoadService extends Service {
         
         // Send the notification.
         // We use a string id because it is a unique number.  We use it later to cancel.
+        NotificationManager mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         mNM.notify(NOTIFICATION, notification);                    	    	
     }   
     
-public void sendCoords(boolean isManualParam, String snm, String sde, boolean noline) {
+    public void sendCoords(boolean isManualParam, String snm, String sde, boolean noline) {
 		
 		boolean bISAautosend = preferences.getBoolean("autosend", true);
 		Log.d(MRDefaults.LOGTAG, "sautosend = " + bISAautosend);
@@ -823,10 +848,11 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 
 		statusOfGPS     = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);	
 		statusOfNetwork = mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		
 		//statusOfPassive = mlocManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
 		
-		Log.d(MRDefaults.LOGTAG, "statusOfGPS=" + statusOfGPS + ", statusOfNetwork=" + statusOfNetwork + 
-				"statusOfPassive = " + statusOfPassive);
+		Log.d(MRDefaults.LOGTAG, "GPSStatus(): statusOfGPS=" + statusOfGPS + ", statusOfNetwork=" + statusOfNetwork + 
+				", statusOfPassive = " + statusOfPassive);
 		
 		if(statusOfGPS)     res = res | MRDefaults.GPS_PROVIDER_OK;
 		if(statusOfNetwork) res = res | MRDefaults.NETWORK_PROVIDER_OK;
@@ -883,7 +909,7 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 		//mlocManager.addGpsStatusListener(listener);		
 		
 		if(!coordsWasGet) { 
-			if(!statusOfGPS) {
+			if(!statusOfGPS) {				
 				if(!statusOfNetwork) {
 					return false;
 				}			
@@ -895,7 +921,7 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 						prevLoc = loc;
 						lPrevMillis = SystemClock.elapsedRealtime();						
 					}
-				}				
+				}			
 			} else {
 				if((statusMask & MRDefaults.GPS_PROVIDER_OK) == MRDefaults.GPS_PROVIDER_OK) {			
 					Location temploc = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -968,8 +994,8 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 	    bundle.putString(MRDefaults.SERVSTR_RESULT,    sretvalue);
 	    bundle.putString(MRDefaults.SERVSTR_COORDS,    sDetectedCoords);
 	    bundle.putString(MRDefaults.SERVSTR_DATETIME,  sDetectedCoordsDateTime);
-	    String str = ""+getString(R.string.queue_points)+": " + queue.size() + ", "+getString(R.string.sent)+": "+ 
-		countAllOK;
+	    String str = "" + getString(R.string.queue_points) + ": " + queue.size() + 
+	    		", " + getString(R.string.sent) + ": " + countAllOK;
 	    bundle.putString(MRDefaults.SERVSTR_QUEUESIZE,  str);
 	    bundle.putString(MRDefaults.SERVSTR_NETSTATUS, sNetStatus);
 	    newMsg.setData(bundle);	
@@ -979,9 +1005,6 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 	            mClients.get(i).send(newMsg);
 
 	        } catch (RemoteException e) {
-	            // The client is dead.  Remove it from the list;
-	            // we are going through the list from back to front
-	            // so this is safe to do inside the loop.
 	            mClients.remove(i);
 	        } catch (android.util.AndroidRuntimeException arte) {
 	        	Log.e(MRDefaults.LOGTAG, "" + arte.getMessage());
@@ -1105,7 +1128,7 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 				    isOK = false;    	
 				    isUseExtStorageDirectory = false;
 				} catch (IOException e) {
-				    Log.e(MRDefaults.LOGTAG, "Could not write file " + "test.txt" + ":" + e.getMessage());
+				    Log.e(MRDefaults.LOGTAG, "Could not write file " + "test.txt" + ": " + e.getMessage());
 				    isOK = false;
 				    isUseExtStorageDirectory = false;
 				}
@@ -1400,7 +1423,7 @@ public void sendCoords(boolean isManualParam, String snm, String sde, boolean no
 		    		e.getMessage());
 		    isOK = false;    			
 		} catch (IOException e) {
-		    Log.e(MRDefaults.LOGTAG, "Could not write file " + saveFileName + ":" + e.getMessage());
+		    Log.e(MRDefaults.LOGTAG, "Could not write file " + saveFileName + ": " + e.getMessage());
 		    isOK = false;
 		}					
 		return isOK;
