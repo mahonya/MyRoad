@@ -35,6 +35,7 @@ public class CoordPoint implements Parcelable{
 		
 	private boolean isOk = true;
 	private boolean isEmpty = true;
+	private boolean isManual = false;
 
 	public CoordPoint(String... params) {
 		us = params[0];	
@@ -95,7 +96,7 @@ public class CoordPoint implements Parcelable{
 		}
 		
 		if (de != null && !"".equals(de) && de.length() > 0) {
-			res += " DE ";
+			res += " DE " + de;
 		}		
 
 		return res;
@@ -105,11 +106,11 @@ public class CoordPoint implements Parcelable{
 		String res  = "us " + us + " pw " + pw;
 			
 		if (nm != null && !"".equals(nm) && nm.length() > 0) {
-			res += " nm " +nm;
+			res += " nm " + nm.replaceAll(" ", "_");
 		}
 		if (tr != null && !"".equals(tr) && tr.length() > 0) {
 			if(!tr.equals("NOLINE")) res+= " NOLINE ";
-			else res += " tr " +tr;
+			else res += " tr " + tr;
 		}
 		res += " dt " + dt + " la " + la + " lo " + lo;
 		
@@ -118,7 +119,7 @@ public class CoordPoint implements Parcelable{
 		}
 		
 		if (de != null && !"".equals(de) && de.length() > 0) {
-			res += " de ";
+			res += " de " + de.replaceAll(" ", "_");
 		}		
 
 		return res;
