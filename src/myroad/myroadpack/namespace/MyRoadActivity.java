@@ -39,7 +39,7 @@ public class MyRoadActivity extends Activity implements OnClickListener {
 	final static String appTitle = MRDefaults.appTitle;
 	
     private Locale locale;
-    private String lang;	
+    private String lang = "en";	
 	
 	//private static ProgressDialog progress = null;
 	
@@ -202,6 +202,7 @@ public class MyRoadActivity extends Activity implements OnClickListener {
         if (lang.equals("default")) {
         	lang = getResources().getConfiguration().locale.getCountry();
         }
+        if(lang.length()==0) lang = "en";
         locale = new Locale(lang);
         Locale.setDefault(locale);
         Configuration config = new Configuration();
@@ -288,12 +289,12 @@ public class MyRoadActivity extends Activity implements OnClickListener {
 		
 		if (us.length() == 0) {
 			needEditOptions = true;
-			Toast.makeText(context, ""+getString(R.string.please_su), Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "" + getString(R.string.please_su), Toast.LENGTH_SHORT).show();
 			return false;
 		}
 		if (pw.length() == 0) {
 			needEditOptions = true;
-			Toast.makeText(context, ""+getString(R.string.please_sp), Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "" + getString(R.string.please_sp), Toast.LENGTH_SHORT).show();
 		}
 		
 		return !needEditOptions;

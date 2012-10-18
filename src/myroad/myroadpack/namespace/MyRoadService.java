@@ -72,7 +72,7 @@ public class MyRoadService extends Service implements LocationListener {
 	String lastCoordStatus = "";
 	String sNetStatus = "";
 	
-	String lang = "";
+	String lang = "en";
 		
 	LocationManager mlocManager;
 	
