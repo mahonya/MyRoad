@@ -35,7 +35,7 @@ public class CoordPoint implements Parcelable{
 		
 	private boolean isOk = true;
 	private boolean isEmpty = true;
-	private boolean isManual = false;
+//	private boolean isManual = false;
 
 	public CoordPoint(String... params) {
 		us = params[0];	

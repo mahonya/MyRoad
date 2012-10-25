@@ -74,8 +74,8 @@ public class MyRoadService extends Service implements LocationListener {
 	
 	String lang = "en";
 		
-	LocationManager mlocManager;
-	
+	//final LocationManager mlocManager;
+	LocationManager mlocManager = null; 		
 	PendingIntent pendingIntent = null;
 	
 	boolean statusOfGPS = false;
@@ -206,7 +206,8 @@ public class MyRoadService extends Service implements LocationListener {
     public void onCreate(){
     	super.onCreate();
     	Log.v(MRDefaults.LOGTAG, "Service.onCreate()");
-    	
+    
+    	mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);    	
     	preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	
 		lang = preferences.getString("lang", "default");	
@@ -225,7 +226,6 @@ public class MyRoadService extends Service implements LocationListener {
     	mNetworkStateChangedFilter.addAction(Intent.ACTION_TIME_TICK);		
     	mNetworkStateChangedFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);		  
 	
-    	mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     	smsManager = SmsManager.getDefault();	    	    	    	
     	
     	getStorageDirectory();    					

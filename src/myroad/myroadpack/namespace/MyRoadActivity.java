@@ -435,8 +435,8 @@ public class MyRoadActivity extends Activity implements OnClickListener {
 		    stopService(service);		    
 		    
         	finish();
-			System.runFinalizersOnExit(true);
-			System.exit(0);
+			//System.runFinalizersOnExit(true);
+			//System.exit(0);
         	
             return true;
             
