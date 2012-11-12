@@ -44,5 +44,17 @@
 	<string name="pref_pass">Password</string>
 	
 	<string name="pref_deftr">Keep empty for default track</string>	
+	<string name="pref_sending">Coords will send...</string>
+	<string name="pref_auto">Automaticly by timeout or meters</string>
+	
+	<string name="pref_deltasecs_summary">Каждые N секунд</string>
+	<string name="pref_deltasecs_title">Таймаут, сек</string>
+	<string name="pref_delta_summary">Каждые N метров</string>
+	<string name="pref_delta_title">Перемещение, метров</string>		
+	<string name="pref_method_summary">Метод отправки</string>
+	<string name="pref_method_title">HTTP или SMS</string>
+	<string name="pref_phone_summary">Номер телефона</string>
+	<string name="pref_phone_title">Куда отправлять SMS</string>		
+	<string name="pref_place_summary">Где хранить файлы</string>				
 	
 </resources>

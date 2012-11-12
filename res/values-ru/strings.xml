@@ -44,5 +44,17 @@
 	<string name="pref_pass">Пароль</string>	
 	
 	<string name="pref_deftr">Оставьте пустым для путешествия по умолчанию</string>	
+	<string name="pref_sending">Отправка координат...</string>	
+	<string name="pref_auto">Автоматически по таймауту или по расстоянию</string>
+	
+	<string name="pref_deltasecs_summary">Every N secounds</string>
+	<string name="pref_deltasecs_title">Timeout, sec</string>
+	<string name="pref_delta_summary">Every N meters</string>
+	<string name="pref_delta_title">Delta, metres</string>		
+	<string name="pref_method_summary">Sending method</string>
+	<string name="pref_method_title">Via HTTP or SMS</string>
+	<string name="pref_phone_summary">Phone number</string>
+	<string name="pref_phone_title">SMS receiver</string>		
+	<string name="pref_place_summary">Place to storing data</string>				
 
 </resources>
